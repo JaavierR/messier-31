@@ -4,7 +4,7 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Welcome to Astro.">
-  <main class="max-w-xl mx-auto">
+  <main class="relative h-full mx-auto px-8">
     <h1>
       This is a test for the font editor <span class="text-gradient">Astro</span
       >
@@ -15,6 +15,12 @@ import Layout from "../layouts/Layout.astro";
       <strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
     </p>
 
-    <FontDisplay client:load />
+    <FontDisplay client:idle />
+
+    <div
+      class="absolute text-sm bottom-6 inset-x-0 mx-auto w-full rounded-xl font-semibold text-center bg-slate-900/20 backdrop-blur-md px-4 py-2"
+    >
+      Texto prueba
+    </div>
   </main>
 </Layout>
