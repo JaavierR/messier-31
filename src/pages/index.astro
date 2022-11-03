@@ -18,9 +18,13 @@ import Layout from "../layouts/Layout.astro";
     <FontDisplay client:idle />
 
     <div
-      class="absolute text-sm bottom-6 inset-x-0 mx-auto w-full rounded-xl font-semibold text-center bg-slate-900/20 backdrop-blur-md px-4 py-2"
+      class="absolute text-sm bottom-6 inset-x-0 w-full font-semibold text-center px-4"
     >
-      Texto prueba
+      <div
+        class="mx-auto w-full rounded-xl bg-slate-900/20 backdrop-blur-md px-4 py-2"
+      >
+        Texto prueba
+      </div>
     </div>
   </main>
 </Layout>

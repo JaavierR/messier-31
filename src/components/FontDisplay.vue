@@ -20,9 +20,15 @@ const setFont = async (e: InputFileEvent) => {
 
 <template>
   <div class="mt-10">
-    This is a fucking test with vue {{ font?.familyName }}
+    <h1 class="text-3xl font-semibold tracking-tight text-stone-900">
+      {{ font?.fullName }}
+    </h1>
+    <span class="text-stone-500 text-sm">
+      {{ font?.copyright }}
+    </span>
   </div>
   <div
+    v-if="!font"
     class="mt-1 flex justify-center rounded-lg border-2 border-dashed border-slate-300 px-6 pt-5 pb-6"
   >
     <div class="space-y-1 text-center">
