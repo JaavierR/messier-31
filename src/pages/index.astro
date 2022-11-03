@@ -1,6 +1,5 @@
 ---
-import FontDisplay from "@/components/FontDisplay";
-import FontVue from "@/components/FontVue.vue";
+import FontDisplay from "@/components/FontDisplay.vue";
 import Layout from "../layouts/Layout.astro";
 ---
 
@@ -16,7 +15,6 @@ import Layout from "../layouts/Layout.astro";
       <strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
     </p>
 
-    <FontDisplay client:idle />
-    <FontVue client:load />
+    <FontDisplay client:load />
   </main>
 </Layout>
