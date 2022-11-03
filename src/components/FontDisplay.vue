@@ -7,10 +7,13 @@ interface InputFileEvent extends Event {
   target: HTMLInputElement;
 }
 
-const font = ref<Font | undefined>();
+const font = ref<Font | null>(null);
 
 const setFont = async (e: InputFileEvent) => {
-  const fontData = await loadFont(e);
+  const fontFile = e.target.files && e.target.files[0];
+  if (!fontFile) return;
+
+  const fontData = await loadFont(fontFile);
   font.value = fontData;
 };
 </script>
