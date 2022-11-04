@@ -46,9 +46,7 @@ function onChange(e: InputFileEvent) {
 }
 
 watch(axes, (axes) => {
-  console.log(axes);
   if (!axes) return;
-
   variationSettings.value = Object.fromEntries(
     Object.entries(axes).map(([key, { default: value }]) => [key, value])
   );
