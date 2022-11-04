@@ -42,14 +42,17 @@ const setFont = async (e: InputEvent) => {
 };
 
 function onAxisChange(tag: string, e: InputEvent) {
+  const settings = Object.assign({}, variationSettings.value, {
+    [tag]: e.target.value,
+  });
+
   variationName.value = null;
-  variationSettings.value[tag] = e.target.value as unknown as number;
+  variationSettings.value = settings;
 }
 
 function onChange(e: InputEvent) {
   const variation = e.target.value;
   if (!font.value) return;
-
   variationSettings.value = font.value.namedVariations[variation];
 }
 
