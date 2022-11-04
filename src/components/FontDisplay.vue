@@ -152,8 +152,6 @@ watch(font, (font) => {
     </option>
   </select>
 
-  {{ axes }}
-
   <div v-for="tag in Object.keys(axes)" :key="tag">
     <label :for="axes[tag].name">{{ axes[tag]?.name }}</label>
     <input
