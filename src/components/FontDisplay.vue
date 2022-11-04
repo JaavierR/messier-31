@@ -4,29 +4,11 @@ import { loadFont } from "@/helpers/fontkit-utils";
 import { getBase64, injectGlobalFontFace } from "@/helpers/css-utils";
 import type { Font } from "fontkit";
 
-interface InputFileEvent extends Event {
+interface InputEvent extends Event {
   target: HTMLInputElement;
 }
 
-const font = ref<Font | null>(null);
-const url = ref<string>("");
-const axes = computed<Test>(() => {
-  if (!font.value) return [];
-  return font.value.variationAxes;
-});
-const variationSettings = ref({});
-const variationName = ref("");
-
-const setFont = async (e: InputFileEvent) => {
-  const fontFile = e.target.files && e.target.files[0];
-  if (!fontFile) return;
-
-  url.value = await getBase64(fontFile);
-  const fontData = await loadFont(fontFile);
-  font.value = markRaw(fontData);
-};
-
-interface Test {
+interface VariationAxes {
   [key: string]: {
     name: string;
     min: number;
@@ -35,13 +17,39 @@ interface Test {
   };
 }
 
-function onAxisChange(tag, e) {
-  variationName.value = null;
-  variationSettings.value[tag] = e.target.value;
+interface FontVariable extends Font {
+  namedVariations: { [key: string]: number };
+  variationAxes: VariationAxes;
+  "OS/2": { fsSelection: { italic: boolean } };
 }
 
-function onChange(e: InputFileEvent) {
+const font = ref<FontVariable | null>(null);
+const url = ref<string>("");
+const axes = computed<VariationAxes>(() => {
+  if (!font.value) return {};
+  return font.value.variationAxes;
+});
+const variationSettings = ref<{ [key: string]: number }>({});
+const variationName = ref<string | null>(null);
+
+const setFont = async (e: InputEvent) => {
+  const fontFile = e.target.files && e.target.files[0];
+  if (!fontFile) return;
+
+  url.value = await getBase64(fontFile);
+  const fontData = await loadFont(fontFile);
+  font.value = markRaw(fontData as FontVariable);
+};
+
+function onAxisChange(tag: string, e: InputEvent) {
+  variationName.value = null;
+  variationSettings.value[tag] = e.target.value as unknown as number;
+}
+
+function onChange(e: InputEvent) {
   const variation = e.target.value;
+  if (!font.value) return;
+
   variationSettings.value = font.value.namedVariations[variation];
 }
 
@@ -143,6 +151,8 @@ watch(font, (font) => {
       {{ variation }}
     </option>
   </select>
+
+  {{ axes }}
 
   <div v-for="tag in Object.keys(axes)" :key="tag">
     <label :for="axes[tag].name">{{ axes[tag]?.name }}</label>
