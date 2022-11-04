@@ -15,6 +15,7 @@ const axes = computed<Test>(() => {
   return font.value.variationAxes;
 });
 const variationSettings = ref({});
+const test = ref("");
 
 const setFont = async (e: InputFileEvent) => {
   const fontFile = e.target.files && e.target.files[0];
@@ -52,6 +53,8 @@ watch(font, (font) => {
     fontWeight: 500,
     url: url.value,
   });
+
+  test.value = variationSettings.value;
 });
 </script>
 
@@ -107,6 +110,25 @@ watch(font, (font) => {
       <p class="text-xs text-slate-500">TTF, OTF, WOFF up to 10MB</p>
     </div>
   </div>
+
+  <select
+    v-if="font"
+    name="named-variations"
+    id="named-variations"
+    v-model="test"
+    className="mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+  >
+    <option
+      :key="variation[0]"
+      v-for="variation in Object.entries(font?.namedVariations)"
+      :value="variation[1]"
+    >
+      {{ variation[0] }}
+    </option>
+  </select>
+
+  <!-- {{ font?.namedVariations[] }} -->
+  {{ test }}
 
   <div v-for="tag in Object.keys(axes)" :key="tag">
     <label :for="axes[tag].name">{{ axes[tag]?.name }}</label>
