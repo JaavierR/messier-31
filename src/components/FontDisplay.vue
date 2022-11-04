@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, markRaw, watch } from "vue";
+import { ref, markRaw, watch, computed } from "vue";
 import { loadFont } from "@/helpers/fontkit-utils";
 import { getBase64, injectGlobalFontFace } from "@/helpers/css-utils";
 import type { Font } from "fontkit";
@@ -10,6 +10,11 @@ interface InputFileEvent extends Event {
 
 const font = ref<Font | null>(null);
 const url = ref<string>("");
+const axes = computed<Test>(() => {
+  if (!font.value) return [];
+  return font.value.variationAxes;
+});
+const variationSettings = ref({});
 
 const setFont = async (e: InputFileEvent) => {
   const fontFile = e.target.files && e.target.files[0];
@@ -19,6 +24,24 @@ const setFont = async (e: InputFileEvent) => {
   const fontData = await loadFont(fontFile);
   font.value = markRaw(fontData);
 };
+
+interface Test {
+  [key: string]: {
+    name: string;
+    min: number;
+    max: number;
+    default: number;
+  };
+}
+
+watch(axes, (axes) => {
+  console.log(axes);
+  if (!axes) return;
+
+  variationSettings.value = Object.fromEntries(
+    Object.entries(axes).map(([key, { default: value }]) => [key, value])
+  );
+});
 
 watch(font, (font) => {
   if (!font) return;
@@ -85,11 +108,28 @@ watch(font, (font) => {
     </div>
   </div>
 
+  <div v-for="tag in Object.keys(axes)" :key="tag">
+    <label :for="axes[tag].name">{{ axes[tag]?.name }}</label>
+    <input
+      type="range"
+      :min="axes[tag]?.min"
+      :max="axes[tag]?.max"
+      :step="0.001"
+      :value="variationSettings[tag]"
+      @input.prevent="variationSettings[tag] = $event.target.value"
+      :id="axes[tag]?.name"
+    />
+  </div>
+
   <div
-    contenteditable
     spellcheck="false"
     class="text-[3rem]"
-    :style="{ fontFamily: font?.familyName }"
+    :style="{
+      fontFamily: font?.familyName,
+      fontVariationSettings: Object.keys(variationSettings)
+        .map((key) => `'${key}' ${variationSettings[key]}`)
+        .join(', '),
+    }"
   >
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores fuga
     asperiores distinctio aliquid placeat voluptate eaque? Maiores beatae maxime
