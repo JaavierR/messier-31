@@ -15,7 +15,7 @@ const axes = computed<Test>(() => {
   return font.value.variationAxes;
 });
 const variationSettings = ref({});
-const test = ref("");
+const variationName = ref("");
 
 const setFont = async (e: InputFileEvent) => {
   const fontFile = e.target.files && e.target.files[0];
@@ -33,6 +33,16 @@ interface Test {
     max: number;
     default: number;
   };
+}
+
+function onAxisChange(tag, e) {
+  variationName.value = null;
+  variationSettings.value[tag] = e.target.value;
+}
+
+function onChange(e: InputFileEvent) {
+  const variation = e.target.value;
+  variationSettings.value = font.value.namedVariations[variation];
 }
 
 watch(axes, (axes) => {
@@ -54,7 +64,14 @@ watch(font, (font) => {
     url: url.value,
   });
 
-  test.value = variationSettings.value;
+  Object.keys(font.namedVariations).forEach((key) => {
+    if (
+      JSON.stringify(font.namedVariations[key]) ===
+      JSON.stringify(variationSettings.value)
+    ) {
+      variationName.value = key;
+    }
+  });
 });
 </script>
 
@@ -115,20 +132,19 @@ watch(font, (font) => {
     v-if="font"
     name="named-variations"
     id="named-variations"
-    v-model="test"
+    v-model="variationName"
+    @change.prevent="onChange"
     className="mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
   >
+    <option value="null" disabled>Custom</option>
     <option
-      :key="variation[0]"
-      v-for="variation in Object.entries(font?.namedVariations)"
-      :value="variation[1]"
+      :key="variation"
+      v-for="variation in Object.keys(font?.namedVariations)"
+      :value="variation"
     >
-      {{ variation[0] }}
+      {{ variation }}
     </option>
   </select>
-
-  <!-- {{ font?.namedVariations[] }} -->
-  {{ test }}
 
   <div v-for="tag in Object.keys(axes)" :key="tag">
     <label :for="axes[tag].name">{{ axes[tag]?.name }}</label>
@@ -138,7 +154,7 @@ watch(font, (font) => {
       :max="axes[tag]?.max"
       :step="0.001"
       :value="variationSettings[tag]"
-      @input.prevent="variationSettings[tag] = $event.target.value"
+      @input.prevent="onAxisChange(tag, $event)"
       :id="axes[tag]?.name"
     />
   </div>
