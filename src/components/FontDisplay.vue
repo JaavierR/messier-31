@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, markRaw, watch, computed } from "vue";
+import { ref, markRaw, watch, computed, onMounted, onUpdated } from "vue";
 import { loadFont } from "@/helpers/fontkit-utils";
 import { getBase64, injectGlobalFontFace } from "@/helpers/css-utils";
 import type { Font } from "fontkit";
@@ -82,6 +82,28 @@ watch(font, (font) => {
     }
   });
 });
+
+onUpdated(() => {
+  const rangeInputs = document.querySelectorAll('input[type="range"]');
+
+  function handleInputChange(e) {
+    let target = e.target;
+
+    if (target.type !== "range") {
+      target = document.getElementById("range");
+    }
+
+    const min = target.min;
+    const max = target.max;
+    const val = target.value;
+
+    target.style.backgroundSize = ((val - min) * 100) / (max - min) + "% 100%";
+  }
+
+  rangeInputs.forEach((input) => {
+    input.addEventListener("input", handleInputChange);
+  });
+});
 </script>
 
 <template>
@@ -155,17 +177,23 @@ watch(font, (font) => {
     </option>
   </select>
 
-  <div v-for="tag in Object.keys(axes)" :key="tag">
-    <label :for="axes[tag].name">{{ axes[tag]?.name }}</label>
-    <input
-      type="range"
-      :min="axes[tag]?.min"
-      :max="axes[tag]?.max"
-      :step="0.001"
-      :value="variationSettings[tag]"
-      @input.prevent="onAxisChange(tag, $event)"
-      :id="axes[tag]?.name"
-    />
+  <div class="space-y-4">
+    <div
+      v-for="tag in Object.keys(axes)"
+      :key="tag"
+      class="flex items-center space-x-4"
+    >
+      <label :for="axes[tag].name">{{ axes[tag]?.name }}</label>
+      <input
+        type="range"
+        :min="axes[tag]?.min"
+        :max="axes[tag]?.max"
+        :step="0.001"
+        :value="variationSettings[tag]"
+        @input.prevent="onAxisChange(tag, $event)"
+        :id="axes[tag]?.name"
+      />
+    </div>
   </div>
 
   <div
